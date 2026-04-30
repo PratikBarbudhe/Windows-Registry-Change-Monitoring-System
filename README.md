@@ -1,75 +1,49 @@
 # Windows Registry Change Monitoring System
 
-A comprehensive Python-based monitoring system for detecting unauthorized, suspicious, or malicious changes in Windows Registry keys. This tool creates baselines of critical registry areas and identifies potential security threats through change detection and malware pattern recognition.
+A Python-based monitoring system for detecting unauthorized, suspicious, or malicious changes in Windows Registry keys. This project tracks critical registry areas, creates baselines, and reports deviations to help secure Windows endpoints.
 
 ## Overview
 
-The Windows Registry Change Monitoring System provides:
-- **Registry Monitoring**: Real-time monitoring of critical Windows Registry keys
-- **Baseline Management**: Create and compare registry baselines for integrity verification
-- **Change Detection**: Identify added, removed, and modified registry values
-- **Threat Detection**: Recognize suspicious patterns that may indicate malware activity
-- **Comprehensive Logging**: Detailed logging and alerting for security incidents
-- **JSON Export**: Export baselines and alerts for analysis and auditing
-
-## Key Features
-
-### 1. Registry Monitoring
-- Monitor multiple registry hives (HKLM, HKCU, HKCR, HKU)
-- Support for any registry path and value
-- Robust error handling for permission issues and missing keys
-- Configurable monitored keys via JSON configuration
-
-### 2. Baseline Management
-- Create snapshots of registry state at any time
-- Save baselines to JSON for persistence
-- Load previously saved baselines for comparison
-- Timestamp tracking for audit trails
-
-### 3. Change Detection
-- **Added Values**: Detect new registry entries
-- **Removed Values**: Track deletion of registry entries
-- **Modified Values**: Identify changed registry values
-- Summary statistics for quick overview
-
-### 4. Threat Detection
-- Pattern-based detection for malware signatures
-- Suspicious pattern recognition (PowerShell, CMD, scripts, etc.)
-- High-risk path monitoring (Windows Run keys, Services, etc.)
-- Critical security-related value removal alerts
-
-### 5. Logging & Alerts
-- Multi-level logging (DEBUG, INFO, WARNING, CRITICAL)
-- Console and file-based logging
-- Structured alert generation with severity levels
-- Alert summaries and statistics
+The Windows Registry Change Monitoring System includes:
+- **Registry Monitoring**: Track critical Windows Registry keys and values
+- **Baseline Comparison**: Save and compare registry snapshots over time
+- **Change Detection**: Detect added, removed, and modified values
+- **Threat Awareness**: Flag suspicious patterns and high-risk registry locations
+- **Logging**: Support console and file-based logging
+- **CI Ready**: Built with GitHub Actions for automated tests and linting
 
 ## Project Structure
 
-```
+```text
+Windows-Registry-Change-Monitoring-System/
+├── .github/
+│   └── workflows/
+│       └── python-app.yml   # GitHub Actions workflow for CI
 ├── src/
 │   ├── __init__.py
 │   └── monitor.py          # Core monitoring module
 ├── tests/
 │   ├── __init__.py
-│   └── test_monitor.py     # Comprehensive test suite
-├── requirements.txt         # Python dependencies
-├── README.md               # This file
-└── LICENSE                # Project license
+│   └── test_monitor.py     # Sample unit test
+├── .gitattributes
+├── .gitignore
+├── LICENSE
+├── README.md
+└── requirements.txt
 ```
 
 ## Installation
 
 ### Prerequisites
 - Python 3.7 or higher
-- Windows OS (for registry access)
-- Administrator privileges (recommended for full access)
+- Windows OS for registry access
+- Administrator privileges for full registry visibility
 
 ### Setup
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/Windows-Registry-Change-Monitoring-System.git
+git clone https://github.com/PratikBarbudhe/Windows-Registry-Change-Monitoring-System.git
 cd Windows-Registry-Change-Monitoring-System
 ```
 
@@ -77,6 +51,33 @@ cd Windows-Registry-Change-Monitoring-System
 ```bash
 pip install -r requirements.txt
 ```
+
+## Usage
+
+Run the monitoring module:
+```bash
+python -m src.monitor
+```
+
+The current implementation is a starter scaffold with a placeholder entry point. Add registry scanning, baseline creation, comparison logic, and alerting in `src/monitor.py`.
+
+## Testing
+
+Run tests with:
+```bash
+pytest
+```
+
+## CI / GitHub Actions
+
+A workflow is included at `.github/workflows/python-app.yml` to:
+- install dependencies
+- run tests
+- run linting with `flake8`
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
 
 ## Usage
 
