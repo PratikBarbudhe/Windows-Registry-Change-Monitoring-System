@@ -49,6 +49,11 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Monitoring outputs
+registry_monitor.log
+registry_alerts.json
+registry_baseline.json
+
 # Translations
 *.mo
 *.pot
