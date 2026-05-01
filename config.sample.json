@@ -1,0 +1,20 @@
+{
+  "monitored_keys": [
+    {
+      "hive": "HKLM",
+      "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+    },
+    {
+      "hive": "HKCU",
+      "path": "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+    },
+    {
+      "hive": "HKLM",
+      "path": "Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon"
+    },
+    {
+      "hive": "HKLM",
+      "path": "System\\CurrentControlSet\\Services"
+    }
+  ]
+}
