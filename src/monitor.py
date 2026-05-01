@@ -2,6 +2,7 @@
 Windows Registry Change Monitoring System
 Main monitoring module
 """
+import argparse
 import winreg
 import logging
 from typing import Dict, List, Tuple, Any
@@ -432,42 +433,81 @@ class AlertManager:
 
 
 
-def main():
+def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments for the monitoring system"""
+    parser = argparse.ArgumentParser(
+        description='Windows Registry Change Monitoring System'
+    )
+    parser.add_argument(
+        '--config',
+        help='Path to JSON config file with monitored registry keys',
+        default=None
+    )
+    parser.add_argument(
+        '--baseline',
+        help='Path to baseline JSON file',
+        default='registry_baseline.json'
+    )
+    parser.add_argument(
+        '--alerts',
+        help='Path to save alerts JSON file',
+        default='registry_alerts.json'
+    )
+    parser.add_argument(
+        '--create-baseline',
+        help='Create or refresh the registry baseline',
+        action='store_true'
+    )
+    parser.add_argument(
+        '--compare',
+        help='Compare current registry state with an existing baseline',
+        action='store_true'
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
     """Main entry point for the registry monitoring system"""
+    args = parse_args()
+
     print("Windows Registry Change Monitoring System v0.1.0")
     print("Starting registry monitor...")
+
+    monitor = RegistryMonitor(config_file=args.config)
     
-    # Initialize monitor
-    monitor = RegistryMonitor()
-    
-    # Add some critical Windows registry keys to monitor
-    critical_keys = [
-        ('HKLM', r'Software\Microsoft\Windows\CurrentVersion\Run'),
-        ('HKCU', r'Software\Microsoft\Windows\CurrentVersion\Run'),
-    ]
-    
-    for hive, path in critical_keys:
-        monitor.add_monitored_key(hive, path)
-    
+    if not monitor.monitored_keys:
+        default_keys = [
+            ('HKLM', r'Software\Microsoft\Windows\CurrentVersion\Run'),
+            ('HKCU', r'Software\Microsoft\Windows\CurrentVersion\Run'),
+        ]
+        for hive, path in default_keys:
+            monitor.add_monitored_key(hive, path)
+
     print(f"Monitoring {len(monitor.monitored_keys)} registry keys...")
-    
-    # Create baseline
-    monitor.create_baseline()
-    monitor.save_baseline()
-    
-    # Initialize comparator and detector
+
+    if args.create_baseline:
+        monitor.create_baseline()
+        monitor.save_baseline(args.baseline)
+        print(f"Baseline created and saved to {args.baseline}")
+        return 0
+
+    monitor.load_baseline(args.baseline)
     comparator = BaselineComparator(monitor)
     detector = ChangeDetector(comparator)
-    
-    # Check for changes
-    summary = comparator.get_summary()
-    print(f"Summary: {summary['total_changes']} changes detected")
-    
-    if summary['total_changes'] > 0:
+
+    comparator_summary = comparator.get_summary()
+    print(f"Summary: {comparator_summary['total_changes']} changes detected")
+
+    if comparator_summary['total_changes'] > 0:
         alerts = detector.detect_changes()
+        detector.save_alerts(args.alerts)
         print(f"Generated {len(alerts)} security alerts")
-        detector.save_alerts()
+        print(f"Alerts saved to {args.alerts}")
+    else:
+        print("No registry changes detected.")
+
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -111,6 +111,22 @@ alerts = detector.detect_changes()
 detector.save_alerts('alerts.json')
 ```
 
+### Command-Line Usage
+
+Run the monitor directly from the command line:
+
+```bash
+python src/monitor.py --create-baseline --baseline registry_baseline.json
+python src/monitor.py --compare --baseline registry_baseline.json --alerts registry_alerts.json
+```
+
+Available options:
+- `--config <path>`: JSON config file with monitored registry keys
+- `--baseline <path>`: Baseline JSON file path
+- `--alerts <path>`: Alerts JSON file path
+- `--create-baseline`: Create or refresh the registry baseline
+- `--compare`: Compare current registry state to the baseline
+
 ### Configuration File
 
 Create a `config.json` file to configure monitored keys:
