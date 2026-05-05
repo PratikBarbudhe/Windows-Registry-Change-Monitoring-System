@@ -1,5 +1,6 @@
 # Core runtime
-pywin32>=305
+# `pywin32` is Windows-only and should be skipped on Linux (e.g., Streamlit Cloud).
+pywin32>=305; platform_system == "Windows"
 flask>=3.0.0
 
 # Optional formatting/console helpers
