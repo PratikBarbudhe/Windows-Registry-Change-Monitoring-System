@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: windows-registry-change-monitoring-system
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app/web/app.py
