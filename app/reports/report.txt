@@ -1,6 +1,6 @@
 Windows Registry Change Monitoring Report
 =============================================
-Generated: 2026-05-05T15:16:34.600691
+Generated: 2026-05-05T19:24:19.617433
 
 Summary
 --------------------

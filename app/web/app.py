@@ -26,10 +26,21 @@ def create_app() -> Flask:
     return app
 
 
+def _is_streamlit_runtime() -> bool:
+    """Return True when this module is executed by Streamlit."""
+    if any(key.startswith("STREAMLIT_") for key in os.environ):
+        return True
+    return "streamlit.runtime.scriptrunner.script_runner" in sys.modules
+
+
 if __name__ == "__main__":
-    # Prevent duplicate auto-open in reloader contexts.
-    if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
-        threading.Timer(1.0, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
-    web_app = create_app()
-    web_app.run(host="127.0.0.1", port=5000, debug=False)
+    if _is_streamlit_runtime():
+        # Streamlit Cloud runs this file as a script; avoid starting a nested Flask server.
+        print("Detected Streamlit runtime; skipping Flask dev server startup.")
+    else:
+        # Prevent duplicate auto-open in reloader contexts.
+        if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
+            threading.Timer(1.0, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
+        web_app = create_app()
+        web_app.run(host="127.0.0.1", port=5000, debug=False)
 
