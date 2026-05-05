@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="{{ refresh_seconds }}">
+    <title>Registry Alerts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <h1>Alert Center</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Dashboard</a>
+            <a href="{{ url_for('logs') }}">Logs</a>
+            <a class="active" href="{{ url_for('alerts') }}">Alerts</a>
+            <a href="{{ url_for('download_report') }}">Download Report</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2 class="risk-high">HIGH Severity Alerts ({{ high_alerts|length }})</h2>
+            <ul class="alert-list">
+                {% for alert in high_alerts %}
+                <li class="alert high">
+                    <strong>{{ alert.timestamp }}</strong> — {{ alert.type }} — {{ alert.path }}<br>
+                    <small>{{ alert.reason }}</small>
+                </li>
+                {% else %}
+                <li class="alert empty">No HIGH severity alerts found.</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2 class="risk-medium">MEDIUM Severity Alerts ({{ medium_alerts|length }})</h2>
+            <ul class="alert-list">
+                {% for alert in medium_alerts %}
+                <li class="alert medium">
+                    <strong>{{ alert.timestamp }}</strong> — {{ alert.type }} — {{ alert.path }}<br>
+                    <small>{{ alert.reason }}</small>
+                </li>
+                {% else %}
+                <li class="alert empty">No MEDIUM severity alerts found.</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+</body>
+</html>
+

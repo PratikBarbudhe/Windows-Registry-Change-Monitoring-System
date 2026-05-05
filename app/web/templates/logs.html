@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="{{ refresh_seconds }}">
+    <title>Registry Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <h1>Registry Logs</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Dashboard</a>
+            <a class="active" href="{{ url_for('logs') }}">Logs</a>
+            <a href="{{ url_for('alerts') }}">Alerts</a>
+            <a href="{{ url_for('download_report') }}">Download Report</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <form method="get" class="filters">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search path, reason, value...">
+                <select name="severity">
+                    <option value="">All Severities</option>
+                    <option value="LOW" {% if severity == "LOW" %}selected{% endif %}>LOW</option>
+                    <option value="MEDIUM" {% if severity == "MEDIUM" %}selected{% endif %}>MEDIUM</option>
+                    <option value="HIGH" {% if severity == "HIGH" %}selected{% endif %}>HIGH</option>
+                </select>
+                <button type="submit">Filter</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Type</th>
+                            <th>Severity</th>
+                            <th>Path</th>
+                            <th>Value Name</th>
+                            <th>Old Value</th>
+                            <th>New Value</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>{{ row.timestamp }}</td>
+                            <td>{{ row.type }}</td>
+                            <td>
+                                <span class="badge
+                                    {% if row.severity == 'HIGH' %}risk-high{% elif row.severity == 'MEDIUM' %}risk-medium{% else %}risk-low{% endif %}
+                                ">
+                                    {{ row.severity }}
+                                </span>
+                            </td>
+                            <td>{{ row.path }}</td>
+                            <td>{{ row.value_name }}</td>
+                            <td>{{ row.old_value }}</td>
+                            <td>{{ row.new_value }}</td>
+                            <td>{{ row.reason }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8">No logs found for current filter.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
+

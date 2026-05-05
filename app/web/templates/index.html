@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="{{ refresh_seconds }}">
+    <title>Registry Monitor Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <h1>Windows Registry Monitoring Dashboard</h1>
+        <nav>
+            <a class="active" href="{{ url_for('index') }}">Dashboard</a>
+            <a href="{{ url_for('logs') }}">Logs</a>
+            <a href="{{ url_for('alerts') }}">Alerts</a>
+            <a href="{{ url_for('download_report') }}">Download Report</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% if data.toast %}
+        <div id="toast" class="toast show">{{ data.toast }}</div>
+        {% endif %}
+
+        <section class="card controls">
+            <div class="status-wrap">
+                <h2>Monitoring Control</h2>
+                {% if data.monitor.running %}
+                <p class="status status-running">🟢 Monitoring Running</p>
+                {% else %}
+                <p class="status status-stopped">🔴 Monitoring Stopped</p>
+                {% endif %}
+                <p>Current interval: <strong>{{ data.monitor.interval_seconds }}s</strong></p>
+                {% if data.monitor.last_error %}
+                <p class="risk-high">Last error: {{ data.monitor.last_error }}</p>
+                {% endif %}
+            </div>
+
+            <div class="actions">
+                <form method="post" action="{{ url_for('start_monitoring_route') }}">
+                    <button class="btn btn-start" type="submit">Start Monitoring</button>
+                </form>
+                <form method="post" action="{{ url_for('stop_monitoring_route') }}">
+                    <button class="btn btn-stop" type="submit">Stop Monitoring</button>
+                </form>
+                <form method="post" action="{{ url_for('generate_report_route') }}">
+                    <button class="btn btn-report" type="submit">Generate Report</button>
+                </form>
+            </div>
+
+            <form method="post" action="{{ url_for('set_interval_route') }}" class="interval-form">
+                <label for="interval_seconds">Select Scan Interval:</label>
+                <select name="interval_seconds" id="interval_seconds">
+                    {% for sec in interval_options %}
+                    <option value="{{ sec }}" {% if sec == data.monitor.interval_seconds %}selected{% endif %}>
+                        {% if sec < 60 %}{{ sec }} sec{% elif sec == 60 %}1 min{% else %}{{ sec // 60 }} min{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button class="btn" type="submit">Update Interval</button>
+            </form>
+        </section>
+
+        <section class="grid cards">
+            <article class="card">
+                <h2>Total Changes</h2>
+                <p class="metric">{{ data.total_changes }}</p>
+            </article>
+            <article class="card">
+                <h2>Suspicious Activities</h2>
+                <p class="metric risk-medium">{{ data.suspicious_activities }}</p>
+            </article>
+            <article class="card">
+                <h2>Autorun Entries Detected</h2>
+                <p class="metric">{{ data.autorun_entries }}</p>
+            </article>
+            <article class="card">
+                <h2>Last Scan Time</h2>
+                <p class="metric small">{{ data.last_scan_time }}</p>
+            </article>
+        </section>
+
+        <section class="grid two">
+            <article class="card">
+                <h2>Baseline Status</h2>
+                <p>Exists: <strong>{{ "Yes" if data.baseline.exists else "No" }}</strong></p>
+                <p>Version: <strong>{{ data.baseline.version }}</strong></p>
+                <p>Monitored Keys: <strong>{{ data.baseline.keys }}</strong></p>
+                <p class="muted">
+                    Key List:
+                    {% if data.baseline.key_list %}
+                        {{ data.baseline.key_list|join(", ") }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+            </article>
+
+            <article class="card">
+                <h2>Report Snapshot</h2>
+                <pre class="report-preview">{{ data.report.text }}</pre>
+            </article>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Last dashboard refresh: {{ data.updated_at }} (auto every {{ refresh_seconds }}s)
+    </footer>
+    <script>
+        const toast = document.getElementById("toast");
+        if (toast) {
+            setTimeout(() => toast.classList.remove("show"), 2600);
+        }
+    </script>
+</body>
+</html>
+

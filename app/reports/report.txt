@@ -1,0 +1,23 @@
+Windows Registry Change Monitoring Report
+=============================================
+Generated: 2026-05-05T15:16:34.600691
+
+Summary
+--------------------
+Total changes: 0
+Suspicious activities: 0
+Autorun detections: 0
+Integrity violations: 0
+Severity breakdown: LOW=0, MEDIUM=0, HIGH=0
+
+Suspicious Activities
+--------------------
+No suspicious activity detected.
+
+Autorun Detections
+--------------------
+No suspicious autorun changes detected.
+
+Integrity Violations
+--------------------
+No integrity violations detected.

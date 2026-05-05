@@ -1,5 +1,6 @@
 # Core runtime
 pywin32>=305
+flask>=3.0.0
 
 # Optional formatting/console helpers
 colorama>=0.4.6

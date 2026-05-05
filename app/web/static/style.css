@@ -1,0 +1,266 @@
+:root {
+    --bg: #0b1020;
+    --panel: #141a2d;
+    --text: #d9e1f2;
+    --muted: #8e99b8;
+    --border: #27304a;
+    --high: #ff4d4d;
+    --medium: #ffc857;
+    --low: #4cd964;
+    --link: #6ca8ff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Segoe UI, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.topbar {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.topbar h1 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+nav {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: var(--link);
+    text-decoration: none;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 0.35rem;
+}
+
+nav a.active,
+nav a:hover {
+    border-color: var(--link);
+}
+
+.container {
+    padding: 1rem 1.5rem;
+}
+
+.grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.grid.cards {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-bottom: 1rem;
+}
+
+.grid.two {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.metric {
+    font-size: 1.8rem;
+    margin: 0.4rem 0 0;
+}
+
+.metric.small {
+    font-size: 1rem;
+    word-break: break-word;
+}
+
+.risk-high {
+    color: var(--high);
+}
+
+.risk-medium {
+    color: var(--medium);
+}
+
+.risk-low {
+    color: var(--low);
+}
+
+.badge {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.table-wrap {
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+th,
+td {
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    vertical-align: top;
+}
+
+.filters {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+input,
+select,
+button {
+    background: #0d1326;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 0.35rem;
+    padding: 0.45rem 0.6rem;
+}
+
+button {
+    cursor: pointer;
+}
+
+.report-preview {
+    margin: 0;
+    white-space: pre-wrap;
+    color: var(--muted);
+}
+
+.alert-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.alert {
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    padding: 0.65rem;
+    border-radius: 0.35rem;
+    background: #11192f;
+}
+
+.alert.high {
+    border-left-color: var(--high);
+}
+
+.alert.medium {
+    border-left-color: var(--medium);
+}
+
+.alert.empty {
+    border-left-color: var(--low);
+}
+
+.footer {
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 0.5rem 1.5rem 1rem;
+}
+
+.controls {
+    margin-bottom: 1rem;
+}
+
+.status-wrap h2 {
+    margin-top: 0;
+}
+
+.status {
+    margin: 0.4rem 0;
+    font-weight: 700;
+}
+
+.status-running {
+    color: var(--low);
+}
+
+.status-stopped {
+    color: var(--high);
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0.5rem 0 0.9rem;
+}
+
+.btn {
+    border: 1px solid var(--border);
+}
+
+.btn-start {
+    border-color: #2f8f5b;
+}
+
+.btn-stop {
+    border-color: #b63c3c;
+}
+
+.btn-report {
+    border-color: #b98a2d;
+}
+
+.interval-form {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.toast {
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+    background: #1f2b46;
+    border: 1px solid #35518b;
+    color: var(--text);
+    padding: 0.65rem 0.85rem;
+    border-radius: 0.45rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 9999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+

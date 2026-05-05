@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from typing import Any, Dict, List, Tuple
 
 from app.config.settings import load_settings
@@ -12,6 +13,19 @@ from app.monitoring.integrity_checker import create_baseline, load_baseline
 from app.monitoring.monitor import start_monitoring
 from app.reports.report_generator import generate_report
 from app.utils.logger import export_events_to_csv, log_event, print_alert, setup_logger
+
+
+def _write_last_scan_file(timestamp: str, interval: int) -> None:
+    """Persist last scan timestamp for dashboard widgets."""
+    settings = load_settings(interval_seconds=interval)
+    payload = {
+        "last_scan_time": timestamp,
+        "updated_at": timestamp,
+        "interval_seconds": interval,
+    }
+    output = settings.data_dir / "logs" / "last_scan.json"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
 def parse_args() -> argparse.Namespace:
@@ -108,6 +122,9 @@ def run() -> None:
             interval=settings.monitoring_interval_seconds,
             max_cycles=args.cycles,
         ):
+            cycle_timestamp = cycle_data.get("timestamp")
+            if cycle_timestamp:
+                _write_last_scan_file(cycle_timestamp, settings.monitoring_interval_seconds)
             events = cycle_data.get("events", [])
             integrity_violations = cycle_data.get("integrity_violations", [])
 
