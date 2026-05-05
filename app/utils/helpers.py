@@ -4,15 +4,22 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-import winreg
+try:
+    import winreg  # type: ignore[attr-defined]
+except ImportError:  # Non-Windows runtime (e.g., Streamlit Cloud Linux)
+    winreg = None  # type: ignore[assignment]
 
-HIVE_MAP = {
-    "HKCU": winreg.HKEY_CURRENT_USER,
-    "HKLM": winreg.HKEY_LOCAL_MACHINE,
-    "HKCR": winreg.HKEY_CLASSES_ROOT,
-    "HKU": winreg.HKEY_USERS,
-    "HKCC": winreg.HKEY_CURRENT_CONFIG,
-}
+HIVE_MAP = (
+    {
+        "HKCU": winreg.HKEY_CURRENT_USER,
+        "HKLM": winreg.HKEY_LOCAL_MACHINE,
+        "HKCR": winreg.HKEY_CLASSES_ROOT,
+        "HKU": winreg.HKEY_USERS,
+        "HKCC": winreg.HKEY_CURRENT_CONFIG,
+    }
+    if winreg is not None
+    else {}
+)
 
 
 def normalize_registry_data(data: Any) -> Any:
@@ -36,6 +43,14 @@ def parse_registry_path(path: str) -> Tuple[Optional[int], str]:
 
 def list_registry_values(path: str) -> Dict[str, Any]:
     """Enumerate all value names/data/types in a registry key with safe errors."""
+    if winreg is None:
+        return {
+            "path": path,
+            "exists": False,
+            "values": {},
+            "error": "Windows registry access is only available on Windows.",
+        }
+
     hive, sub_key = parse_registry_path(path)
     if hive is None:
         return {
