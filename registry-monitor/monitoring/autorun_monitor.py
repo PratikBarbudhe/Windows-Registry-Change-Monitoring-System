@@ -8,9 +8,9 @@ from typing import Any, Dict, List
 
 
 SUSPICIOUS_PATH_HINTS = [
-    r"\appdata\",
-    r"\temp\",
-    r"\tmp\",
+    "\\appdata\\",
+    "\\temp\\",
+    "\\tmp\\",
 ]
 
 TRUSTED_PREFIXES = [
