@@ -32,7 +32,8 @@ classifiers = [
 ]
 dependencies = [
     "pywin32>=305",
-    "pyyaml>=6.0",
+    "colorama>=0.4.6",
+    "tabulate>=0.9.0",
 ]
 
 [project.optional-dependencies]
@@ -56,7 +57,7 @@ Issues = "https://github.com/yourusername/Windows-Registry-Change-Monitoring-Sys
 Changelog = "https://github.com/yourusername/Windows-Registry-Change-Monitoring-System/blob/main/CHANGELOG.md"
 
 [project.scripts]
-registry-monitor = "src.monitor:main"
+registry-monitor = "app.main:run"
 
 [tool.setuptools]
 zip-safe = false
@@ -64,7 +65,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src*"]
+include = ["app*"]
 
 [tool.black]
 line-length = 88
@@ -91,7 +92,7 @@ line_length = 88
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q --cov=src --cov-report=html --cov-report=term-missing"
+addopts = "-ra -q --cov=app --cov-report=html --cov-report=term-missing"
 testpaths = [
     "tests",
 ]
@@ -118,7 +119,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.coverage.run]
-source = ["src"]
+source = ["app"]
 omit = [
     "*/tests/*",
     "*/test_*",

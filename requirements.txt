@@ -1,20 +1,10 @@
-# Windows Registry Monitoring System Dependencies
-
-# Core dependencies
+# Core runtime
 pywin32>=305
-pyyaml>=6.0
 
-# Monitoring and logging
-python-dotenv>=0.19.0
+# Optional formatting/console helpers
+colorama>=0.4.6
+tabulate>=0.9.0
 
-# Testing
+# Test and quality tooling
 pytest>=7.0
 pytest-cov>=3.0
-
-# Code quality
-flake8>=4.0
-black>=22.0
-pylint>=2.12
-
-# Type checking
-mypy>=0.950

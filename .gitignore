@@ -1,6 +1,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+**/__pycache__/
 *.py[cod]
+*.pyc
 *$py.class
 
 # C extensions
@@ -142,3 +144,7 @@ Thumbs.db
 *.reg
 *.bak
 logs/
+data/logs/*
+data/baseline/*
+!data/logs/.gitkeep
+!data/baseline/.gitkeep

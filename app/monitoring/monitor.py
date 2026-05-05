@@ -6,8 +6,8 @@ import datetime as dt
 import time
 from typing import Any, Dict, Generator, List, Optional, Set
 
-from utils.hashing import add_hashes_to_snapshot
-from monitoring.integrity_checker import compare_integrity, take_registry_snapshot
+from app.monitoring.integrity_checker import compare_integrity, take_registry_snapshot
+from app.utils.hashing import add_hashes_to_snapshot
 
 
 def _path_category(path: str, registry_paths: Dict[str, Any]) -> str:

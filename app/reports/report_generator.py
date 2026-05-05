@@ -12,7 +12,7 @@ def generate_report(
     suspicious_events: List[Dict[str, Any]],
     autorun_findings: List[Dict[str, Any]],
     integrity_violations: List[Dict[str, Any]],
-    output_file: str = "reports/report.txt",
+    output_file: str = "app/reports/report.txt",
 ) -> str:
     """Generate a plain-text report containing monitoring outcomes."""
     os.makedirs(os.path.dirname(output_file), exist_ok=True)

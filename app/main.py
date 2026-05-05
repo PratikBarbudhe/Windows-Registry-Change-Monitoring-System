@@ -2,26 +2,44 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+import argparse
 from typing import Any, Dict, List, Tuple
 
-from config.registry_paths import REGISTRY_PATHS
-from detection.malware_patterns import detect_malware_patterns
-from monitoring.autorun_monitor import detect_autorun_changes
-from monitoring.integrity_checker import create_baseline, load_baseline
-from monitoring.monitor import start_monitoring
-from reports.report_generator import generate_report
-from utils.logger import export_events_to_csv, log_event, print_alert
+from app.config.settings import load_settings
+from app.detection.malware_patterns import detect_malware_patterns
+from app.monitoring.autorun_monitor import detect_autorun_changes
+from app.monitoring.integrity_checker import create_baseline, load_baseline
+from app.monitoring.monitor import start_monitoring
+from app.reports.report_generator import generate_report
+from app.utils.logger import export_events_to_csv, log_event, print_alert, setup_logger
 
-APP_DIR = Path(__file__).resolve().parent
-BASELINE_FILE = str(APP_DIR / "baseline" / "baseline.json")
-LOG_FILE = str(APP_DIR / "logs" / "registry_log.txt")
-CSV_FILE = str(APP_DIR / "logs" / "registry_log.csv")
-REPORT_FILE = str(APP_DIR / "reports" / "report.txt")
+
+def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments."""
+    parser = argparse.ArgumentParser(description="Windows Registry Change Monitoring System")
+    parser.add_argument(
+        "--mode",
+        choices=["create", "load"],
+        default="load",
+        help="Choose whether to create a new baseline or load existing baseline.",
+    )
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=10,
+        help="Polling interval in seconds.",
+    )
+    parser.add_argument(
+        "--cycles",
+        type=int,
+        default=None,
+        help="Optional number of monitoring cycles before exiting.",
+    )
+    return parser.parse_args()
 
 
 def _choose_baseline_mode() -> Tuple[str, int]:
-    """Prompt user for baseline mode and polling interval."""
+    """Prompt user for baseline mode and polling interval when CLI args are absent."""
     print("Windows Registry Change Monitoring System")
     print("=" * 45)
     print("1) Create new baseline")
@@ -45,7 +63,8 @@ def _enrich_event_with_patterns(event: Dict[str, Any]) -> Dict[str, Any]:
     if not pattern_findings:
         return event
 
-    highest = max(pattern_findings, key=lambda item: {"LOW": 1, "MEDIUM": 2, "HIGH": 3}.get(item["severity"], 1))
+    severity_rank = {"LOW": 1, "MEDIUM": 2, "HIGH": 3}
+    highest = max(pattern_findings, key=lambda item: severity_rank.get(item["severity"], 1))
     if highest.get("severity") in {"MEDIUM", "HIGH"}:
         event["severity"] = highest.get("severity")
         event["reason"] = highest.get("reason")
@@ -55,30 +74,46 @@ def _enrich_event_with_patterns(event: Dict[str, Any]) -> Dict[str, Any]:
 
 def run() -> None:
     """Run baseline management, monitoring loop, logging, alerting, and reporting."""
+    args = parse_args()
+    mode = args.mode
+    interval = args.interval
+    if mode not in {"create", "load"}:
+        mode, interval = _choose_baseline_mode()
+
+    settings = load_settings(interval_seconds=interval)
+    logger = setup_logger(settings.log_file)
+    logger.info("Application settings loaded.")
+
     all_events: List[Dict[str, Any]] = []
     suspicious_events: List[Dict[str, Any]] = []
     all_autorun_findings: List[Dict[str, Any]] = []
     all_integrity_violations: List[Dict[str, Any]] = []
 
     try:
-        mode, interval = _choose_baseline_mode()
         if mode == "create":
-            baseline_data = create_baseline(REGISTRY_PATHS, baseline_file=BASELINE_FILE)
-            print("Baseline created successfully.")
+            baseline_data = create_baseline(
+                settings.registry_paths, baseline_file=str(settings.baseline_file)
+            )
+            print(f"Baseline created successfully at: {settings.baseline_file}")
         else:
-            baseline_data = load_baseline(baseline_file=BASELINE_FILE)
-            print("Baseline loaded.")
+            baseline_data = load_baseline(baseline_file=str(settings.baseline_file))
+            print(f"Baseline loaded from: {settings.baseline_file}")
 
         baseline_snapshot = baseline_data.get("snapshot", {})
-        print(f"Monitoring started with interval={interval}s. Press Ctrl+C to stop.")
+        print(f"Monitoring started with interval={settings.monitoring_interval_seconds}s. Press Ctrl+C to stop.")
 
-        for cycle_data in start_monitoring(REGISTRY_PATHS, baseline_snapshot=baseline_snapshot, interval=interval):
+        for cycle_data in start_monitoring(
+            settings.registry_paths,
+            baseline_snapshot=baseline_snapshot,
+            interval=settings.monitoring_interval_seconds,
+            max_cycles=args.cycles,
+        ):
             events = cycle_data.get("events", [])
             integrity_violations = cycle_data.get("integrity_violations", [])
 
             for event in events:
                 enriched = _enrich_event_with_patterns(event)
-                log_event(enriched, log_file=LOG_FILE)
+                log_event(enriched, log_file=settings.log_file, logger=logger)
                 print_alert(enriched)
                 all_events.append(enriched)
                 if enriched.get("severity") in {"MEDIUM", "HIGH"}:
@@ -102,13 +137,14 @@ def run() -> None:
                     "new_value": violation.get("new_value"),
                     "reason": violation.get("reason"),
                 }
-                log_event(violation_event, log_file=LOG_FILE)
+                log_event(violation_event, log_file=settings.log_file, logger=logger)
                 print_alert(violation_event)
                 all_integrity_violations.append(violation)
 
     except KeyboardInterrupt:
         print("\nMonitoring stopped by user.")
     except Exception as exc:  # noqa: BLE001
+        logger.exception("Unexpected runtime error: %s", exc)
         print(f"Unexpected error: {exc}")
     finally:
         try:
@@ -117,12 +153,13 @@ def run() -> None:
                 suspicious_events=suspicious_events,
                 autorun_findings=all_autorun_findings,
                 integrity_violations=all_integrity_violations,
-                output_file=REPORT_FILE,
+                output_file=str(settings.report_file),
             )
-            csv_path = export_events_to_csv(all_events, output_file=CSV_FILE)
+            csv_path = export_events_to_csv(all_events, output_file=settings.csv_file)
             print(f"Report generated: {report_path}")
             print(f"CSV exported: {csv_path}")
         except Exception as exc:  # noqa: BLE001
+            logger.exception("Failed to generate final artifacts: %s", exc)
             print(f"Failed to generate final report artifacts: {exc}")
 
 
