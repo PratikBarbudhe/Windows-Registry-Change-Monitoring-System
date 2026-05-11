@@ -30,7 +30,9 @@ def _write_last_scan_file(timestamp: str, interval: int) -> None:
 
 def parse_args() -> argparse.Namespace:
     """Parse CLI arguments."""
-    parser = argparse.ArgumentParser(description="Windows Registry Change Monitoring System")
+    parser = argparse.ArgumentParser(
+        description="Windows Registry Change Monitoring System"
+    )
     parser.add_argument(
         "--mode",
         choices=["create", "load"],
@@ -48,7 +50,6 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=None,
         help="Optional number of monitoring cycles before exiting.",
-    )
     )
     return parser.parse_args()
 
@@ -130,7 +131,9 @@ def run() -> None:
         ):
             cycle_timestamp = cycle_data.get("timestamp")
             if cycle_timestamp:
-                _write_last_scan_file(cycle_timestamp, settings.monitoring_interval_seconds)
+                _write_last_scan_file(
+                    cycle_timestamp, settings.monitoring_interval_seconds
+                )
             events = cycle_data.get("events", [])
             integrity_violations = cycle_data.get("integrity_violations", [])
 
@@ -146,7 +149,10 @@ def run() -> None:
             for finding in autorun_findings:
                 if finding.get("suspicious"):
                     all_autorun_findings.append(finding)
-                    print(f"[ALERT] [{finding.get('severity')}] Autorun suspicious: {finding.get('reason')}")
+                    print(
+                        f"[ALERT] [{finding.get('severity')}] "
+                        f"Autorun suspicious: {finding.get('reason')}"
+                    )
 
             for violation in integrity_violations:
                 violation_event = {
@@ -188,4 +194,3 @@ def run() -> None:
 
 if __name__ == "__main__":
     run()
-
