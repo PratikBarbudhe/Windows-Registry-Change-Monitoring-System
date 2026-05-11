@@ -49,6 +49,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Optional number of monitoring cycles before exiting.",
     )
+    )
     return parser.parse_args()
 
 
@@ -78,7 +79,9 @@ def _enrich_event_with_patterns(event: Dict[str, Any]) -> Dict[str, Any]:
         return event
 
     severity_rank = {"LOW": 1, "MEDIUM": 2, "HIGH": 3}
-    highest = max(pattern_findings, key=lambda item: severity_rank.get(item["severity"], 1))
+    highest = max(
+        pattern_findings, key=lambda item: severity_rank.get(item["severity"], 1)
+    )
     if highest.get("severity") in {"MEDIUM", "HIGH"}:
         event["severity"] = highest.get("severity")
         event["reason"] = highest.get("reason")
@@ -114,7 +117,10 @@ def run() -> None:
             print(f"Baseline loaded from: {settings.baseline_file}")
 
         baseline_snapshot = baseline_data.get("snapshot", {})
-        print(f"Monitoring started with interval={settings.monitoring_interval_seconds}s. Press Ctrl+C to stop.")
+        print(
+            f"Monitoring started with interval={settings.monitoring_interval_seconds}s. "
+            "Press Ctrl+C to stop."
+        )
 
         for cycle_data in start_monitoring(
             settings.registry_paths,
