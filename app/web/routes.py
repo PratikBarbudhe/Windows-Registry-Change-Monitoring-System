@@ -7,9 +7,18 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 
-from flask import Flask, Response, jsonify, redirect, render_template, request, send_file, url_for
+from flask import (
+    Flask,
+    Response,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
 
 from app.web.services.monitor_service import MonitorService
 
@@ -92,8 +101,10 @@ def _last_scan_time(rows: List[Dict[str, str]]) -> str:
     """Return latest event timestamp."""
     if LAST_SCAN_PATH.exists():
         try:
-            payload = json.loads(LAST_SCAN_PATH.read_text(encoding="utf-8"))
-            return payload.get("last_scan_time", "N/A")
+            payload = cast(
+                Dict[str, Any], json.loads(LAST_SCAN_PATH.read_text(encoding="utf-8"))
+            )
+            return str(payload.get("last_scan_time", "N/A"))
         except json.JSONDecodeError:
             pass
     if rows:
@@ -176,7 +187,11 @@ def register_routes(app: Flask) -> None:
         rows = _load_log_rows()
 
         if severity_filter in {"LOW", "MEDIUM", "HIGH"}:
-            rows = [row for row in rows if row.get("severity", "").upper() == severity_filter]
+            rows = [
+                row
+                for row in rows
+                if row.get("severity", "").upper() == severity_filter
+            ]
 
         if q:
             filtered: List[Dict[str, str]] = []
@@ -209,8 +224,12 @@ def register_routes(app: Flask) -> None:
     @app.route("/download/report")
     def download_report() -> Any:
         if REPORT_PATH.exists():
-            return send_file(REPORT_PATH, as_attachment=True, download_name="registry_report.txt")
-        return Response("Report not found. Run monitor first.", status=404, mimetype="text/plain")
+            return send_file(
+                REPORT_PATH, as_attachment=True, download_name="registry_report.txt"
+            )
+        return Response(
+            "Report not found. Run monitor first.", status=404, mimetype="text/plain"
+        )
 
     @app.route("/monitor/start", methods=["POST"])
     def start_monitoring_route() -> Any:
@@ -232,7 +251,9 @@ def register_routes(app: Flask) -> None:
         except ValueError:
             seconds = 10
         MONITOR_SERVICE.set_interval(seconds)
-        return redirect(url_for("index", toast=f"Scan interval updated to {seconds} seconds"))
+        return redirect(
+            url_for("index", toast=f"Scan interval updated to {seconds} seconds")
+        )
 
     @app.route("/monitor/generate-report", methods=["POST"])
     def generate_report_route() -> Any:
@@ -244,4 +265,3 @@ def register_routes(app: Flask) -> None:
         payload = MONITOR_SERVICE.get_status()
         payload["last_scan_time"] = _last_scan_time(_load_log_rows())
         return jsonify(payload)
-
