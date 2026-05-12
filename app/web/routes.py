@@ -23,7 +23,11 @@ INTERVAL_OPTIONS = [5, 10, 30, 60, 300, 600]
 MONITOR_SERVICE = MonitorService()
 
 LOG_PATTERN = re.compile(
-    r"^\[(?P<timestamp>[^\]]+)\]\s+\[(?P<type>[^\]]+)\]\s+\[(?P<severity>[^\]]+)\]\s+(?P<path>.+?)\s+\|\s+(?P<old>.*?)\s+->\s+(?P<new>.*)$"
+    r"^\[(?P<timestamp>[^\]]+)\]\s+"
+    r"\[(?P<type>[^\]]+)\]\s+"
+    r"\[(?P<severity>[^\]]+)\]\s+"
+    r"(?P<path>.+?)\s+\|\s+"
+    r"(?P<old>.*?)\s+->\s+(?P<new>.*)$"
 )
 
 
@@ -203,25 +207,25 @@ def register_routes(app: Flask) -> None:
         )
 
     @app.route("/download/report")
-    def download_report() -> Response:
+    def download_report() -> Any:
         if REPORT_PATH.exists():
             return send_file(REPORT_PATH, as_attachment=True, download_name="registry_report.txt")
         return Response("Report not found. Run monitor first.", status=404, mimetype="text/plain")
 
     @app.route("/monitor/start", methods=["POST"])
-    def start_monitoring_route() -> Response:
+    def start_monitoring_route() -> Any:
         started = MONITOR_SERVICE.start()
         toast = "Monitoring Started" if started else "Monitoring already running"
         return redirect(url_for("index", toast=toast))
 
     @app.route("/monitor/stop", methods=["POST"])
-    def stop_monitoring_route() -> Response:
+    def stop_monitoring_route() -> Any:
         stopped = MONITOR_SERVICE.stop()
         toast = "Monitoring Stopped" if stopped else "Monitoring already stopped"
         return redirect(url_for("index", toast=toast))
 
     @app.route("/monitor/interval", methods=["POST"])
-    def set_interval_route() -> Response:
+    def set_interval_route() -> Any:
         selected = request.form.get("interval_seconds", "10")
         try:
             seconds = int(selected)
@@ -231,12 +235,12 @@ def register_routes(app: Flask) -> None:
         return redirect(url_for("index", toast=f"Scan interval updated to {seconds} seconds"))
 
     @app.route("/monitor/generate-report", methods=["POST"])
-    def generate_report_route() -> Response:
+    def generate_report_route() -> Any:
         MONITOR_SERVICE.generate_report_now()
         return redirect(url_for("index", toast="Report generated"))
 
     @app.route("/api/status")
-    def api_status() -> Response:
+    def api_status() -> Any:
         payload = MONITOR_SERVICE.get_status()
         payload["last_scan_time"] = _last_scan_time(_load_log_rows())
         return jsonify(payload)

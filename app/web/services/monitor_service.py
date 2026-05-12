@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import threading
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Dict, List
 
 from app.config.settings import load_settings
@@ -147,7 +146,11 @@ class MonitorService:
                 return False
             self._stop_event.clear()
             self._settings = load_settings(interval_seconds=self._interval_seconds)
-            self._thread = threading.Thread(target=self._worker, daemon=True, name="RegistryMonitorThread")
+            self._thread = threading.Thread(
+                target=self._worker,
+                daemon=True,
+                name="RegistryMonitorThread",
+            )
             self._running = True
             self._thread.start()
         return True
@@ -178,9 +181,15 @@ class MonitorService:
 
         report_path = generate_report(
             all_events=rows,
-            suspicious_events=[row for row in rows if row.get("severity") in {"MEDIUM", "HIGH"}],
-            autorun_findings=[row for row in rows if "run" in str(row.get("path", "")).lower()],
-            integrity_violations=[row for row in rows if row.get("category") == "integrity"],
+            suspicious_events=[
+                row for row in rows if row.get("severity") in {"MEDIUM", "HIGH"}
+            ],
+            autorun_findings=[
+                row for row in rows if "run" in str(row.get("path", "")).lower()
+            ],
+            integrity_violations=[
+                row for row in rows if row.get("category") == "integrity"
+            ],
             output_file=str(self._settings.report_file),
         )
         return report_path

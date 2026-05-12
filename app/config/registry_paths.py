@@ -11,8 +11,14 @@ REGISTRY_PATHS = {
             r"HKLM\SOFTWARE\Microsoft\Windows Defender\Real-Time Protection",
         ],
         "firewall": [
-            r"HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile",
-            r"HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile",
+            (
+                r"HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters"
+                r"\FirewallPolicy\DomainProfile"
+            ),
+            (
+                r"HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters"
+                r"\FirewallPolicy\StandardProfile"
+            ),
         ],
         "uac": [
             r"HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System",

@@ -89,11 +89,11 @@ extend-exclude = '''
 max-line-length = 100
 extend-ignore = ["E203", "W503"]
 exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-    "*.egg-info",
+  ".git",
+  "__pycache__",
+  "build",
+  "dist",
+  "*.egg-info",
 ]
 
 [tool.isort]
