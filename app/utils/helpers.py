@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+winreg: Any
 try:
-    import winreg  # type: ignore[attr-defined]
+    import winreg
 except ImportError:  # Non-Windows runtime (e.g., Streamlit Cloud Linux)
-    winreg = None  # type: ignore[assignment]
+    winreg = None
 
 HIVE_MAP = (
     {
@@ -113,4 +114,3 @@ def flatten_registry_paths(registry_paths: Dict[str, Any]) -> List[str]:
                 flattened.append(item)
 
     return flattened
-

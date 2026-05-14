@@ -49,7 +49,9 @@ class MonitorService:
         if not findings:
             return event
         rank = {"LOW": 1, "MEDIUM": 2, "HIGH": 3}
-        highest = max(findings, key=lambda item: rank.get(item.get("severity", "LOW"), 1))
+        highest = max(
+            findings, key=lambda item: rank.get(item.get("severity", "LOW"), 1)
+        )
         if highest.get("severity") in {"MEDIUM", "HIGH"}:
             event["severity"] = highest.get("severity")
             event["reason"] = highest.get("reason")
@@ -83,7 +85,9 @@ class MonitorService:
                 if self._stop_event.is_set():
                     break
 
-                cycle_timestamp = cycle_data.get("timestamp", datetime.now().isoformat())
+                cycle_timestamp = cycle_data.get(
+                    "timestamp", datetime.now().isoformat()
+                )
                 self._write_last_scan(cycle_timestamp)
 
                 events = cycle_data.get("events", [])
@@ -91,7 +95,9 @@ class MonitorService:
 
                 for event in events:
                     enriched = self._enrich_event_with_patterns(event)
-                    log_event(enriched, log_file=self._settings.log_file, logger=self._logger)
+                    log_event(
+                        enriched, log_file=self._settings.log_file, logger=self._logger
+                    )
                     print_alert(enriched)
                     all_events.append(enriched)
                     if enriched.get("severity") in {"MEDIUM", "HIGH"}:
@@ -114,7 +120,11 @@ class MonitorService:
                         "new_value": violation.get("new_value"),
                         "reason": violation.get("reason"),
                     }
-                    log_event(violation_event, log_file=self._settings.log_file, logger=self._logger)
+                    log_event(
+                        violation_event,
+                        log_file=self._settings.log_file,
+                        logger=self._logger,
+                    )
                     print_alert(violation_event)
                     all_integrity_violations.append(violation)
 
@@ -175,7 +185,9 @@ class MonitorService:
         if self._settings.csv_file.exists():
             import csv
 
-            with open(self._settings.csv_file, "r", encoding="utf-8", newline="") as handle:
+            with open(
+                self._settings.csv_file, "r", encoding="utf-8", newline=""
+            ) as handle:
                 for row in csv.DictReader(handle):
                     rows.append(row)
 
@@ -203,4 +215,3 @@ class MonitorService:
                 "last_scan_time": self._last_scan_time,
                 "last_error": self._last_error,
             }
-

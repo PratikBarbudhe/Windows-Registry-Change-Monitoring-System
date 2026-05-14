@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 
 from app.utils.hashing import add_hashes_to_snapshot
 from app.utils.helpers import flatten_registry_paths, list_registry_values
@@ -43,7 +43,7 @@ def load_baseline(baseline_file: str = "data/baseline/baseline.json") -> Dict[st
 
     try:
         with open(baseline_file, "r", encoding="utf-8") as file:
-            return json.load(file)
+            return cast(Dict[str, Any], json.load(file))
     except (json.JSONDecodeError, OSError):
         return {"meta": {"baseline_version": 1}, "snapshot": {}}
 
@@ -82,7 +82,8 @@ def compare_integrity(
             )
 
         all_values = sorted(
-            set(base_key.get("values", {}).keys()) | set(curr_key.get("values", {}).keys())
+            set(base_key.get("values", {}).keys())
+            | set(curr_key.get("values", {}).keys())
         )
         for value_name in all_values:
             base_value = base_key.get("values", {}).get(value_name)
@@ -112,7 +113,11 @@ def compare_integrity(
                 )
                 continue
 
-            if base_value and curr_value and base_value.get("hash") != curr_value.get("hash"):
+            if (
+                base_value
+                and curr_value
+                and base_value.get("hash") != curr_value.get("hash")
+            ):
                 violations.append(
                     {
                         "type": "VALUE_MODIFIED",
@@ -126,4 +131,3 @@ def compare_integrity(
                 )
 
     return violations
-

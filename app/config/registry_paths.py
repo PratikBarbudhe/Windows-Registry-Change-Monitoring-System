@@ -36,4 +36,3 @@ REGISTRY_PATHS = {
         ],
     },
 }
-
